@@ -3,29 +3,26 @@ import { dirname } from 'node:path';
 import type { RunResult } from './types.js';
 import { RunResultSchema } from './types.js';
 
-export async function saveBaseline(
-  result: RunResult,
-  filePath: string
-): Promise<void> {
+export async function saveBaseline(result: RunResult, filePath: string): Promise<void> {
   await mkdir(dirname(filePath), { recursive: true });
+  // eslint-disable-next-line unicorn/no-null
   await writeFile(filePath, JSON.stringify(result, null, 2), 'utf8');
 }
 
-export async function loadBaseline(
-  filePath: string
-): Promise<RunResult | null> {
+export async function loadBaseline(filePath: string): Promise<RunResult | null> {
   let raw: string;
   try {
     raw = await readFile(filePath, 'utf8');
-  } catch (err: unknown) {
+  } catch (error: unknown) {
     if (
-      err instanceof Error &&
-      'code' in err &&
-      (err as NodeJS.ErrnoException).code === 'ENOENT'
+      error instanceof Error &&
+      'code' in error &&
+      (error as NodeJS.ErrnoException).code === 'ENOENT'
     ) {
+      // eslint-disable-next-line unicorn/no-null
       return null;
     }
-    throw err;
+    throw error;
   }
 
   const parsed = JSON.parse(raw);

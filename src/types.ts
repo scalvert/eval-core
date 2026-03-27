@@ -27,11 +27,7 @@ export interface RunResult {
   totalCostUsd: number;
 }
 
-export type JudgeFn = (options: {
-  input: string;
-  response: string;
-  rubric: string;
-}) => Promise<{
+export type JudgeFn = (options: { input: string; response: string; rubric: string }) => Promise<{
   passed: boolean;
   score: number;
   reasoning: string;

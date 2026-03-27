@@ -6,10 +6,7 @@ export interface CompareResult {
   improvements: string[];
 }
 
-export function compareRuns(
-  current: RunResult,
-  baseline: RunResult
-): CompareResult {
+export function compareRuns(current: RunResult, baseline: RunResult): CompareResult {
   const baselineMap = new Map<string, boolean>();
   for (const r of baseline.results) {
     baselineMap.set(r.name, r.passed);

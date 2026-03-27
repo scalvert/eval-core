@@ -1,17 +1,48 @@
 {
   "name": "@scalvert/eval-core",
   "version": "0.1.0",
+  "description": "General-purpose LLM evaluation primitives",
+  "keywords": [
+    "llm",
+    "evaluation",
+    "testing",
+    "judge",
+    "baseline"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scalvert/eval-core.git"
+  },
+  "homepage": "https://github.com/scalvert/eval-core#readme",
+  "bugs": {
+    "url": "https://github.com/scalvert/eval-core/issues"
+  },
+  "license": "MIT",
+  "author": "Steve Calvert <steve.calvert@gmail.com>",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist"],
-  "engines": { "node": ">=22" },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean",
-    "test": "vitest run",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint . && npm run format:check",
+    "prepublishOnly": "npm run build",
+    "test": "npm run lint && npm run test:vitest",
+    "test:vitest": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -19,9 +50,23 @@
     "zod": "^3.22.0"
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
+    "@eslint/js": "^9.24.0",
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.29.1",
+    "@typescript-eslint/parser": "^8.29.1",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-jsdoc": "^61.5.0",
+    "eslint-plugin-prettier": "^5.2.6",
+    "eslint-plugin-unicorn": "^62.0.0",
+    "prettier": "^3.5.3",
     "tsup": "^8.0.0",
-    "vitest": "^1.4.0",
-    "@types/node": "^22.0.0"
+    "typescript": "^5.4.0",
+    "vite": "^7.3.0",
+    "vitest": "^4.0.16"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   }
 }

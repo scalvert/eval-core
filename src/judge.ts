@@ -31,8 +31,7 @@ export function createAnthropicJudge(config: AnthropicJudgeConfig): JudgeFn {
       ],
     });
 
-    const text =
-      message.content[0].type === 'text' ? message.content[0].text : '';
+    const text = message.content[0].type === 'text' ? message.content[0].text : '';
     const parsed = parseJudgeResponse(text);
 
     return {

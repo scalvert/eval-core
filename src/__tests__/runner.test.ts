@@ -2,32 +2,32 @@ import { describe, it, expect, vi } from 'vitest';
 import { runEval } from '../runner.js';
 import type { ResponseFn, JudgeFn, TestCase } from '../types.js';
 
+const cases: TestCase[] = [
+  { name: 'test-1', input: 'hello', rubric: 'be friendly' },
+  { name: 'test-2', input: 'bye', rubric: 'be polite' },
+  { name: 'test-3', input: 'help', rubric: 'be helpful' },
+];
+
+function makeRespond(overrides?: Partial<Awaited<ReturnType<ResponseFn>>>): ResponseFn {
+  return vi.fn(async () => ({
+    response: 'ok',
+    inputTokens: 100,
+    outputTokens: 50,
+    ...overrides,
+  }));
+}
+
+function makeJudge(pass: boolean): JudgeFn {
+  return vi.fn(async () => ({
+    passed: pass,
+    score: pass ? 0.9 : 0.3,
+    reasoning: 'reason',
+    inputTokens: 50,
+    outputTokens: 25,
+  }));
+}
+
 describe('runEval', () => {
-  const cases: TestCase[] = [
-    { name: 'test-1', input: 'hello', rubric: 'be friendly' },
-    { name: 'test-2', input: 'bye', rubric: 'be polite' },
-    { name: 'test-3', input: 'help', rubric: 'be helpful' },
-  ];
-
-  function makeRespond(overrides?: Partial<Awaited<ReturnType<ResponseFn>>>): ResponseFn {
-    return vi.fn(async () => ({
-      response: 'ok',
-      inputTokens: 100,
-      outputTokens: 50,
-      ...overrides,
-    }));
-  }
-
-  function makeJudge(pass: boolean): JudgeFn {
-    return vi.fn(async () => ({
-      passed: pass,
-      score: pass ? 0.9 : 0.3,
-      reasoning: 'reason',
-      inputTokens: 50,
-      outputTokens: 25,
-    }));
-  }
-
   it('computes passRate as a fraction', async () => {
     const judge: JudgeFn = vi.fn(async ({ rubric }) => ({
       passed: rubric === 'be friendly',
@@ -67,14 +67,16 @@ describe('runEval', () => {
     const respond: ResponseFn = async () => {
       currentConcurrent++;
       maxConcurrent = Math.max(maxConcurrent, currentConcurrent);
-      await new Promise((r) => setTimeout(r, 50));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 50);
+      });
       currentConcurrent--;
       return { response: 'ok', inputTokens: 10, outputTokens: 5 };
     };
 
-    const fiveCases: TestCase[] = Array.from({ length: 5 }, (_, i) => ({
-      name: `test-${i}`,
-      input: `input-${i}`,
+    const fiveCases: TestCase[] = Array.from({ length: 5 }, (_, index) => ({
+      name: `test-${index}`,
+      input: `input-${index}`,
       rubric: 'rubric',
     }));
 
@@ -110,15 +112,26 @@ describe('runEval', () => {
     expect(result.results).toEqual([]);
   });
 
-  it('calculates cost when costModel is provided', async () => {
+  it('calculates cost when pricing is provided', async () => {
     const result = await runEval({
       testCases: [cases[0]],
       respond: makeRespond(),
       judge: makeJudge(true),
-      costModel: 'claude-haiku-4-5-20251001',
+      pricing: { inputPerMillion: 0.8, outputPerMillion: 4 },
     });
 
     expect(result.results[0].costUsd).toBeGreaterThan(0);
     expect(result.totalCostUsd).toBeGreaterThan(0);
+  });
+
+  it('leaves cost as 0 when pricing is not provided', async () => {
+    const result = await runEval({
+      testCases: [cases[0]],
+      respond: makeRespond(),
+      judge: makeJudge(true),
+    });
+
+    expect(result.results[0].costUsd).toBe(0);
+    expect(result.totalCostUsd).toBe(0);
   });
 });

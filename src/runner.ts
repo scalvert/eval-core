@@ -1,16 +1,16 @@
 import type { TestCase, TestResult, RunResult, JudgeFn, ResponseFn } from './types.js';
-import { calculateCost } from './cost.js';
+import { calculateCost, type Pricing } from './cost.js';
 
 export interface RunEvalOptions {
   testCases: TestCase[];
   respond: ResponseFn;
   judge: JudgeFn;
   concurrency?: number;
-  costModel?: string;
+  pricing?: Pricing;
 }
 
 export async function runEval(options: RunEvalOptions): Promise<RunResult> {
-  const { testCases, respond, judge, concurrency = 3, costModel } = options;
+  const { testCases, respond, judge, concurrency = 3, pricing } = options;
   const runId = `run-${Date.now()}`;
   const timestamp = new Date().toISOString();
   const results: TestResult[] = [];
@@ -29,13 +29,9 @@ export async function runEval(options: RunEvalOptions): Promise<RunResult> {
     });
 
     const durationMs = Math.round(performance.now() - start);
-    const inputTokens =
-      (respondResult.inputTokens ?? 0) + (judgeResult.inputTokens ?? 0);
-    const outputTokens =
-      (respondResult.outputTokens ?? 0) + (judgeResult.outputTokens ?? 0);
-    const costUsd = costModel
-      ? calculateCost(costModel, inputTokens, outputTokens)
-      : 0;
+    const inputTokens = (respondResult.inputTokens ?? 0) + (judgeResult.inputTokens ?? 0);
+    const outputTokens = (respondResult.outputTokens ?? 0) + (judgeResult.outputTokens ?? 0);
+    const costUsd = pricing ? calculateCost(pricing, inputTokens, outputTokens) : 0;
 
     results.push({
       name: testCase.name,

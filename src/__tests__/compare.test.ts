@@ -29,7 +29,7 @@ describe('compareRuns', () => {
         { name: 'a', passed: true },
         { name: 'b', passed: true },
       ],
-      1.0
+      1
     );
     const current = makeRun(
       [
@@ -57,7 +57,7 @@ describe('compareRuns', () => {
         { name: 'a', passed: true },
         { name: 'b', passed: true },
       ],
-      1.0
+      1
     );
 
     const result = compareRuns(current, baseline);
@@ -66,15 +66,15 @@ describe('compareRuns', () => {
   });
 
   it('calculates passRateDelta correctly', () => {
-    const baseline = makeRun([{ name: 'a', passed: true }], 1.0);
-    const current = makeRun([{ name: 'a', passed: false }], 0.0);
+    const baseline = makeRun([{ name: 'a', passed: true }], 1);
+    const current = makeRun([{ name: 'a', passed: false }], 0);
 
     const result = compareRuns(current, baseline);
-    expect(result.passRateDelta).toBeCloseTo(-1.0);
+    expect(result.passRateDelta).toBeCloseTo(-1);
   });
 
   it('ignores test cases only in one run', () => {
-    const baseline = makeRun([{ name: 'a', passed: true }], 1.0);
+    const baseline = makeRun([{ name: 'a', passed: true }], 1);
     const current = makeRun(
       [
         { name: 'a', passed: true },

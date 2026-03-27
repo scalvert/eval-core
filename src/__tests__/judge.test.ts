@@ -4,22 +4,27 @@ import { createAnthropicJudge } from '../judge.js';
 const createMock = vi.fn();
 
 vi.mock('@anthropic-ai/sdk', () => ({
-  default: vi.fn(() => ({
-    messages: { create: createMock },
-  })),
+  default: class MockAnthropic {
+    messages = { create: createMock };
+  },
 }));
+
+const DEFAULT_USAGE = { input_tokens: 100, output_tokens: 50 };
+
+function mockResponse(
+  json: object,
+  usage: { input_tokens: number; output_tokens: number } = DEFAULT_USAGE
+) {
+  createMock.mockResolvedValueOnce({
+    content: [{ type: 'text', text: JSON.stringify(json) }],
+    usage,
+  });
+}
 
 describe('createAnthropicJudge', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
-
-  function mockResponse(json: object, usage = { input_tokens: 100, output_tokens: 50 }) {
-    createMock.mockResolvedValueOnce({
-      content: [{ type: 'text', text: JSON.stringify(json) }],
-      usage,
-    });
-  }
 
   it('returns passed=true when score >= threshold', async () => {
     mockResponse({ pass: true, score: 0.8, reasoning: 'Good' });
@@ -39,7 +44,12 @@ describe('createAnthropicJudge', () => {
 
   it('strips ```json fences', async () => {
     createMock.mockResolvedValueOnce({
-      content: [{ type: 'text', text: '```json\n{"pass": true, "score": 0.9, "reasoning": "ok"}\n```' }],
+      content: [
+        {
+          type: 'text',
+          text: '```json\n{"pass": true, "score": 0.9, "reasoning": "ok"}\n```',
+        },
+      ],
       usage: { input_tokens: 10, output_tokens: 5 },
     });
     const judge = createAnthropicJudge({ model: 'claude-sonnet-4-6', threshold: 0.5 });
@@ -49,7 +59,12 @@ describe('createAnthropicJudge', () => {
 
   it('strips bare ``` fences', async () => {
     createMock.mockResolvedValueOnce({
-      content: [{ type: 'text', text: '```\n{"pass": true, "score": 0.7, "reasoning": "fine"}\n```' }],
+      content: [
+        {
+          type: 'text',
+          text: '```\n{"pass": true, "score": 0.7, "reasoning": "fine"}\n```',
+        },
+      ],
       usage: { input_tokens: 10, output_tokens: 5 },
     });
     const judge = createAnthropicJudge({ model: 'claude-sonnet-4-6', threshold: 0.5 });
