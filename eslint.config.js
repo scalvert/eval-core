@@ -50,6 +50,7 @@ export default [
       ...unicornPlugin.configs.recommended.rules,
       'unicorn/prefer-at': 'off',
       'unicorn/no-typeof-undefined': 'off',
+      'unicorn/no-null': 'off',
     },
   },
   prettier,

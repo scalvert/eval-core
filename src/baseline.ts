@@ -5,7 +5,6 @@ import { RunResultSchema } from './types.js';
 
 export async function saveBaseline(result: RunResult, filePath: string): Promise<void> {
   await mkdir(dirname(filePath), { recursive: true });
-  // eslint-disable-next-line unicorn/no-null
   await writeFile(filePath, JSON.stringify(result, null, 2), 'utf8');
 }
 
@@ -19,7 +18,6 @@ export async function loadBaseline(filePath: string): Promise<RunResult | null> 
       'code' in error &&
       (error as NodeJS.ErrnoException).code === 'ENOENT'
     ) {
-      // eslint-disable-next-line unicorn/no-null
       return null;
     }
     throw error;

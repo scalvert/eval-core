@@ -42,7 +42,7 @@ export type ResponseFn = (input: string) => Promise<{
 }>;
 
 export const TestCaseSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1),
   input: z.string(),
   rubric: z.string(),
 });
@@ -58,12 +58,14 @@ export const TestResultSchema = z.object({
   durationMs: z.number(),
 });
 
-export const RunResultSchema = z.object({
-  runId: z.string(),
-  timestamp: z.string(),
-  passRate: z.number().min(0).max(1),
-  results: z.array(TestResultSchema),
-  totalInputTokens: z.number(),
-  totalOutputTokens: z.number(),
-  totalCostUsd: z.number(),
-});
+export const RunResultSchema = z
+  .object({
+    runId: z.string(),
+    timestamp: z.string(),
+    passRate: z.number().min(0).max(1),
+    results: z.array(TestResultSchema),
+    totalInputTokens: z.number(),
+    totalOutputTokens: z.number(),
+    totalCostUsd: z.number(),
+  })
+  .passthrough();
