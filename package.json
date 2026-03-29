@@ -43,10 +43,18 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
     "zod": "^3.22.0"
   },
+  "peerDependencies": {
+    "@anthropic-ai/sdk": ">=0.80.0"
+  },
+  "peerDependenciesMeta": {
+    "@anthropic-ai/sdk": {
+      "optional": true
+    }
+  },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@eslint/js": "^9.24.0",
     "@release-it-plugins/lerna-changelog": "^5.0.0",
     "@types/node": "^22.0.0",
