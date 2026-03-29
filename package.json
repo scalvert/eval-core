@@ -43,7 +43,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "zod": "^3.22.0"
+    "zod": "^4.3.6"
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.80.0"
