@@ -57,7 +57,7 @@
     "@anthropic-ai/sdk": "^0.80.0",
     "@eslint/js": "^9.24.0",
     "@release-it-plugins/lerna-changelog": "^5.0.0",
-    "@types/node": "^22.0.0",
+    "@types/node": "^25.5.0",
     "@typescript-eslint/eslint-plugin": "^8.29.1",
     "@typescript-eslint/parser": "^8.29.1",
     "eslint": "^9.24.0",
