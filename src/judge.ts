@@ -1,4 +1,3 @@
-import Anthropic from '@anthropic-ai/sdk';
 import { z } from 'zod';
 import type { JudgeFn } from './types.js';
 
@@ -15,9 +14,15 @@ export interface AnthropicJudgeConfig {
 }
 
 export function createAnthropicJudge(config: AnthropicJudgeConfig): JudgeFn {
-  const client = new Anthropic({ apiKey: config.apiKey });
+  let clientPromise: Promise<InstanceType<typeof import('@anthropic-ai/sdk').default>>;
 
   return async ({ input, response, rubric }) => {
+    if (!clientPromise) {
+      clientPromise = import('@anthropic-ai/sdk').then(
+        (mod) => new mod.default({ apiKey: config.apiKey })
+      );
+    }
+    const client = await clientPromise;
     const message = await client.messages.create({
       model: config.model,
       max_tokens: 1024,
